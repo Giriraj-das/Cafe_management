@@ -1,0 +1,6 @@
+{% for order in orders %}
+    <p>Заказ #{{ order.id }} | Стол: {{ order.table_number }} | Статус: {{ order.get_status_display }}</p>
+    <a href="{% url 'order_update' order.id %}">Изменить статус</a> |
+    <a href="{% url 'order_delete' order.id %}">Удалить</a>
+{% endfor %}
+<a href="{% url 'order_create' %}">Добавить заказ</a>
