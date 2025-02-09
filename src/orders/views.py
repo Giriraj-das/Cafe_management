@@ -1,4 +1,6 @@
+from django.urls import reverse_lazy
 from django.views.generic import ListView
+from django.views.generic.edit import CreateView
 
 from .models import Order
 
@@ -20,3 +22,17 @@ class OrderListView(ListView):
             queryset = queryset.filter(status=status)
 
         return queryset
+
+
+class OrderCreateView(CreateView):
+    model = Order
+    fields = ['table_number', 'items', 'status']
+    template_name = 'orders/order_form.html'
+    success_url = reverse_lazy('order_list')
+
+    def form_valid(self, form):
+        """Recalculates total_price before saving"""
+        order = form.save(commit=False)
+        order.calculate_total_price()
+        order.save()
+        return super().form_valid(form)
