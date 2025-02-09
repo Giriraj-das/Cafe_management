@@ -1,6 +1,6 @@
 from django.urls import reverse_lazy
 from django.views.generic import ListView
-from django.views.generic.edit import CreateView
+from django.views.generic.edit import CreateView, UpdateView
 
 from .models import Order
 
@@ -36,3 +36,10 @@ class OrderCreateView(CreateView):
         order.calculate_total_price()
         order.save()
         return super().form_valid(form)
+
+
+class OrderUpdateView(UpdateView):
+    model = Order
+    fields = ['status']
+    template_name = 'orders/order_form.html'
+    success_url = reverse_lazy('order_list')
