@@ -1,4 +1,6 @@
+from django.shortcuts import render
 from django.urls import reverse_lazy
+from django.views import View
 from django.views.generic import ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 
@@ -49,3 +51,9 @@ class OrderDeleteView(DeleteView):
     model = Order
     template_name = 'orders/order_confirm_delete.html'
     success_url = reverse_lazy('order_list')
+
+
+class OrderRevenueView(View):
+    def get(self, request):
+        total_revenue = Order.get_total_revenue()
+        return render(request, 'orders/order_revenue.html', {'total_revenue': total_revenue})
