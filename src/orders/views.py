@@ -1,6 +1,6 @@
 from django.urls import reverse_lazy
 from django.views.generic import ListView
-from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 
 from .models import Order
 
@@ -42,4 +42,10 @@ class OrderUpdateView(UpdateView):
     model = Order
     fields = ['status']
     template_name = 'orders/order_form.html'
+    success_url = reverse_lazy('order_list')
+
+
+class OrderDeleteView(DeleteView):
+    model = Order
+    template_name = 'orders/order_confirm_delete.html'
     success_url = reverse_lazy('order_list')
