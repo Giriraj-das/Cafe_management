@@ -19,7 +19,7 @@ services:
       retries: 3
 
   api:
-    build: ./backend
+    build: .
     restart: always
     depends_on:
       db:
