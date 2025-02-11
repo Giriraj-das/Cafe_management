@@ -1,5 +1,36 @@
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Сохранить</button>
-</form>
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}Создание заказа{% endblock %}
+
+{% block content %}
+    <h2>Создание заказа</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="order">
+            <span class="order-type">Информация о заказе</span>
+            {{ order_form.as_p }}
+        </div>
+
+        <div class="order">
+            <span class="order-type">Блюда</span>
+            {{ dish_formset.management_form }}
+            <div id="dish-formset">
+                {% for form in dish_formset %}
+                    <div class="dish-row">
+                        {{ form.name.label_tag }} {{ form.name }}
+                        {{ form.price.label_tag }} {{ form.price }}
+                        {{ form.quantity.label_tag }} {{ form.quantity }}
+                    </div>
+                {% endfor %}
+            </div>
+            <button type="button" id="add-dish">+</button>
+        </div>
+        <button type="submit">Сохранить заказ</button>
+    </form>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'js/order_form.js' %}"></script>
+{% endblock %}

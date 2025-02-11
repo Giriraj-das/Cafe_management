@@ -26,18 +26,50 @@ class OrderListView(ListView):
         return queryset
 
 
-class OrderCreateView(CreateView):
-    model = Order
-    fields = ['table_number', 'items', 'status']
-    template_name = 'orders/order_form.html'
-    success_url = reverse_lazy('order_list')
+# orders/views.py
+from django.shortcuts import render, redirect
+from django.views import View
+from .forms import OrderForm, DishFormSet
+from .models import Order
 
-    def form_valid(self, form):
-        """Recalculates total_price before saving"""
-        order = form.save(commit=False)
-        order.calculate_total_price()
-        order.save()
-        return super().form_valid(form)
+class OrderCreateView(View):
+    template_name = "orders/order_form.html"
+
+    def get(self, request, *args, **kwargs):
+        order_form = OrderForm()
+        dish_formset = DishFormSet()
+        return render(request, self.template_name, {
+            'order_form': order_form,
+            'dish_formset': dish_formset,
+        })
+
+    def post(self, request, *args, **kwargs):
+        order_form = OrderForm(request.POST)
+        dish_formset = DishFormSet(request.POST)
+        if order_form.is_valid() and dish_formset.is_valid():
+            order = order_form.save(commit=False)
+            items = []
+            total_price = 0
+            for form in dish_formset:
+                name = form.cleaned_data.get("name")
+                price = form.cleaned_data.get("price")
+                quantity = form.cleaned_data.get("quantity")
+                # Если форма заполнена (защита от пустых форм)
+                if name and price and quantity:
+                    items.append({
+                        "name": name,
+                        "price": float(price),
+                        "quantity": quantity
+                    })
+                    total_price += float(price) * quantity
+            order.items = items
+            order.total_price = total_price
+            order.save()
+            return redirect('order_list')
+        return render(request, self.template_name, {
+            'order_form': order_form,
+            'dish_formset': dish_formset,
+        })
 
 
 class OrderUpdateView(UpdateView):

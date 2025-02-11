@@ -16,7 +16,8 @@ class Order(models.Model):
     )
     items = models.JSONField(
         verbose_name='Список блюд',
-        help_text='Формат: [{"name": "Блюдо", "price": 100}]',
+        default=list,
+        help_text='Формат: [{"name": "Блюдо", "price": 100, "quantity": 1}]',
     )
     total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0, editable=False)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending', verbose_name='Статус заказа')
@@ -24,7 +25,7 @@ class Order(models.Model):
 
     def calculate_total_price(self):
         """Recalculates the cost of an order based on the list of dishes"""
-        self.total_price = sum(item.get('price', 0) for item in self.items)
+        self.total_price = sum(item.get('price', 0) * item.get('quantity', 1) for item in self.items)
 
     def save(self, *args, **kwargs):
         self.calculate_total_price()
