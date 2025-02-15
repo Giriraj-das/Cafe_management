@@ -47,6 +47,18 @@ th {
     background-color: #eee;
 }
 
+/* search form */
+form[method="get"] label {
+    margin-right: 5px;
+}
+
+form[method="get"] input,
+form[method="get"] select {
+    margin-right: 10px;
+    padding: 5px;
+    font-size: 14px;
+}
+
 /* create order */
 form {
     margin: 0 auto;
