@@ -24,7 +24,7 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def calculate_total_price(self):
-        """Recalculates the cost of an order based on the list of dishes"""
+        """Recalculates the cost of an order based on the list of dishes."""
         self.total_price = sum(item.get('price', 0) * item.get('quantity', 1) for item in self.items)
 
     def save(self, *args, **kwargs):
@@ -36,5 +36,5 @@ class Order(models.Model):
 
     @classmethod
     def get_total_revenue(cls):
-        """Revenue calculation for all paid orders"""
+        """Revenue calculation for all paid orders."""
         return cls.objects.filter(status='paid').aggregate(Sum('total_price'))['total_price__sum'] or 0
