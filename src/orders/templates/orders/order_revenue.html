@@ -1,2 +1,11 @@
-<p>Выручка за смену: {{ total_revenue }} ₽</p>
-<a href="{% url 'order_list' %}">Вернуться к заказам</a>
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Список заказов{% endblock %}
+
+{% block content %}
+<h2>Выручка</h2>
+
+<p>Выручка: {{ total_revenue }} ₽</p>
+<a href="{% url 'order_list' %}">К заказам</a>
+{% endblock %}
