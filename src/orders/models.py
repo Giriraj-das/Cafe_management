@@ -19,7 +19,7 @@ class Order(models.Model):
         default=list,
         help_text='Формат: [{"name": "Блюдо", "price": 100, "quantity": 1}]',
     )
-    total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0, editable=False)
+    total_price = models.IntegerField(default=0, editable=False)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending', verbose_name='Статус заказа')
     created_at = models.DateTimeField(auto_now_add=True)
 
