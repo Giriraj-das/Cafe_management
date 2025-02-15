@@ -1,10 +1,11 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import ListView
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic.edit import UpdateView, DeleteView
 
 from .models import Order
+from .forms import OrderForm, DishFormSet
 
 
 class OrderListView(ListView):
@@ -14,23 +15,20 @@ class OrderListView(ListView):
 
     def get_queryset(self):
         """Filter orders by table number or status (if specified in the request)"""
-        queryset = Order.objects.all()
+        queryset = Order.objects.all().order_by('-id')
         table_number = self.request.GET.get('table_number')
         status = self.request.GET.get('status')
-
         if table_number:
             queryset = queryset.filter(table_number=table_number)
         if status:
             queryset = queryset.filter(status=status)
-
         return queryset
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['status_choices'] = Order.STATUS_CHOICES
+        return context
 
-# orders/views.py
-from django.shortcuts import render, redirect
-from django.views import View
-from .forms import OrderForm, DishFormSet
-from .models import Order
 
 class OrderCreateView(View):
     template_name = "orders/order_form.html"
@@ -54,7 +52,7 @@ class OrderCreateView(View):
                 name = form.cleaned_data.get("name")
                 price = form.cleaned_data.get("price")
                 quantity = form.cleaned_data.get("quantity")
-                # Если форма заполнена (защита от пустых форм)
+                # Check empty forms
                 if name and price and quantity:
                     items.append({
                         "name": name,
@@ -81,7 +79,6 @@ class OrderUpdateView(UpdateView):
 
 class OrderDeleteView(DeleteView):
     model = Order
-    template_name = 'orders/order_confirm_delete.html'
     success_url = reverse_lazy('order_list')
 
 
