@@ -4,40 +4,78 @@
 {% block title %}Список заказов{% endblock %}
 
 {% block content %}
-    <h2>Список заказов</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Номер стола</th>
-                <th>Список блюд</th>
-                <th>Общая стоимость</th>
-                <th>Статус</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for order in orders %}
-            <tr>
-                <td>{{ order.id }}</td>
-                <td>{{ order.table_number }}</td>
-                <td>
-                    {% if order.items %}
-                        <ul>
-                            {% for dish in order.items %}
-                                <li>
-                                    {{ dish.name }} — {{ dish.price }} руб.
-                                    {% if dish.quantity %} ({{ dish.quantity }}){% endif %}
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        Нет данных
-                    {% endif %}
-                </td>
-                <td>{{ order.total_price }} руб.</td>
-                <td>{{ order.get_status_display }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<h2>Список заказов</h2>
+
+<!-- Форма поиска заказов -->
+<form method="get" action="" style="margin-bottom: 20px;">
+    <label for="table_number">Номер стола:</label>
+    <input type="text" name="table_number" id="table_number" value="{{ request.GET.table_number }}">
+
+    <label for="status">Статус:</label>
+    <select name="status" id="status">
+        <option value="">Все</option>
+        {% for key, value in status_choices %}
+           <option value="{{ key }}" {% if request.GET.status == key %}selected{% endif %}>{{ value }}</option>
+        {% endfor %}
+    </select>
+    <button type="submit">Поиск</button>
+</form>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Номер стола</th>
+            <th>Список блюд</th>
+            <th>Общая стоимость</th>
+            <th>Статус</th>
+            <th>Действия</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for order in orders %}
+        <tr>
+            <td>{{ order.id }}</td>
+            <td>{{ order.table_number }}</td>
+            <td>
+                {% if order.items %}
+                    <ul>
+                        {% for dish in order.items %}
+                            <li>
+                                {{ dish.name }} — {{ dish.price }} руб.
+                                {% if dish.quantity %} ({{ dish.quantity }}){% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    Нет данных
+                {% endif %}
+            </td>
+            <td>{{ order.total_price }} руб.</td>
+            <td>
+                <!-- update order status form -->
+                <form method="post" action="{% url 'order_update' order.id %}">
+                    {% csrf_token %}
+                    <select name="status" onchange="this.form.submit()">
+                        {% for key, value in order.STATUS_CHOICES %}
+                            <option value="{{ key }}" {% if order.status == key %}selected{% endif %}>{{ value }}</option>
+                        {% endfor %}
+                    </select>
+                </form>
+            </td>
+            <td>
+                <!-- delete order form -->
+                <form method="post" action="{% url 'order_delete' order.id %}">
+                    {% csrf_token %}
+                    <button type="submit" onclick="return confirm('Удалить заказ №{{ order.id }}?');">Удалить</button>
+                </form>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6">Заказы не найдены</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock %}
