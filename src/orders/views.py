@@ -1,8 +1,8 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import ListView
-from django.views.generic.edit import UpdateView, DeleteView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 
 from .models import Order
 from .forms import OrderForm, DishFormSet
@@ -30,47 +30,62 @@ class OrderListView(ListView):
         return context
 
 
-class OrderCreateView(View):
-    template_name = "orders/order_form.html"
+class OrderCreateView(CreateView):
+    model = Order
+    form_class = OrderForm
+    template_name = 'orders/order_form.html'
+    success_url = reverse_lazy('order_list')
 
-    def get(self, request, *args, **kwargs):
-        order_form = OrderForm()
-        dish_formset = DishFormSet()
-        return render(request, self.template_name, {
-            'order_form': order_form,
-            'dish_formset': dish_formset,
-        })
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.POST:
+            context['dish_formset'] = DishFormSet(self.request.POST)
+        else:
+            context['dish_formset'] = DishFormSet()
+        return context
 
-    def post(self, request, *args, **kwargs):
-        order_form = OrderForm(request.POST)
-        dish_formset = DishFormSet(request.POST)
-        if order_form.is_valid() and dish_formset.is_valid():
-            order = order_form.save(commit=False)
-            items = []
-            total_price = 0
-            for form in dish_formset:
-                name = form.cleaned_data.get("name")
-                price = form.cleaned_data.get("price")
-                quantity = form.cleaned_data.get("quantity")
-                # Check empty forms
-                if name and price and quantity:
-                    items.append({
-                        "name": name,
-                        "price": float(price),
-                        "quantity": quantity
-                    })
-                    total_price += float(price) * quantity
-            order.items = items
-            order.total_price = total_price
-            order.save()
-            return redirect('order_list')
-        return render(request, self.template_name, {
-            'order_form': order_form,
-            'dish_formset': dish_formset,
-        })
+    def form_valid(self, form):
+        context = self.get_context_data()
+        dish_formset = context['dish_formset']
+        if dish_formset.is_valid():
+            self.object = form.save(commit=False)
+            self.object.items = [dish_form.cleaned_data for dish_form in dish_formset if dish_form.cleaned_data]
+            self.object.save()
+            return super().form_valid(form)
+        return self.form_invalid(form)
 
 
 class OrderUpdateView(UpdateView):
+    """Edit entire order (table, dishes, status)"""
+    model = Order
+    form_class = OrderForm
+    template_name = 'orders/order_form.html'
+    success_url = reverse_lazy('order_list')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        order = self.get_object()
+
+        if self.request.method == 'POST':
+            context['dish_formset'] = DishFormSet(self.request.POST)
+        else:
+            initial_data = order.items if order.items else []
+            context['dish_formset'] = DishFormSet(initial=initial_data)
+
+        return context
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        dish_formset = context['dish_formset']
+        if dish_formset.is_valid():
+            self.object = form.save(commit=False)
+            self.object.items = [dish_form.cleaned_data for dish_form in dish_formset if dish_form.cleaned_data]
+            self.object.save()
+            return super().form_valid(form)
+        return self.form_invalid(form)
+
+
+class OrderStatusUpdateView(UpdateView):
     model = Order
     fields = ['status']
     template_name = 'orders/order_form.html'

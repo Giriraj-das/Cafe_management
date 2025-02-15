@@ -15,4 +15,4 @@ class DishForm(forms.Form):
     quantity = forms.IntegerField(label="Количество", min_value=1, initial=1)
 
 
-DishFormSet = formset_factory(DishForm, extra=1)
+DishFormSet = formset_factory(DishForm, extra=1, can_delete=True)
