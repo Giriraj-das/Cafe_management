@@ -31,10 +31,10 @@ class Order(models.Model):
         self.calculate_total_price()
         super().save(*args, **kwargs)
 
-    def __str__(self):
-        return f'Заказ #{self.id} (Стол {self.table_number}) - {self.get_status_display()}'
-
     @classmethod
     def get_total_revenue(cls):
         """Revenue calculation for all paid orders."""
         return cls.objects.filter(status='paid').aggregate(Sum('total_price'))['total_price__sum'] or 0
+
+    def __str__(self):
+        return f'Заказ #{self.id} (Стол {self.table_number}) - {self.get_status_display()}'
