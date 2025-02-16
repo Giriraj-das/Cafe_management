@@ -15,4 +15,8 @@ class DishForm(forms.Form):
     quantity = forms.IntegerField(label="Количество", min_value=1, initial=1)
 
 
-DishFormSet = formset_factory(DishForm, extra=1, can_delete=True)
+# To create an order – no deletion option
+DishFormSetCreate = formset_factory(DishForm, extra=1, can_delete=False)
+
+# To update an order – with the option to delete
+DishFormSetUpdate = formset_factory(DishForm, extra=0, can_delete=True)

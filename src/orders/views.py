@@ -5,7 +5,7 @@ from django.views.generic import ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 
 from .models import Order
-from .forms import OrderForm, DishFormSet
+from .forms import OrderForm, DishFormSetCreate, DishFormSetUpdate
 
 
 class OrderListView(ListView):
@@ -39,9 +39,9 @@ class OrderCreateView(CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if self.request.POST:
-            context['dish_formset'] = DishFormSet(self.request.POST)
+            context['dish_formset'] = DishFormSetCreate(self.request.POST)
         else:
-            context['dish_formset'] = DishFormSet()
+            context['dish_formset'] = DishFormSetCreate()  # extra=1: будет одна пустая форма
         return context
 
     def form_valid(self, form):
@@ -49,7 +49,10 @@ class OrderCreateView(CreateView):
         dish_formset = context['dish_formset']
         if dish_formset.is_valid():
             self.object = form.save(commit=False)
-            self.object.items = [dish_form.cleaned_data for dish_form in dish_formset if dish_form.cleaned_data]
+            self.object.items = [
+                {**dish_form.cleaned_data, 'price': int(dish_form.cleaned_data['price'] * 100)}
+                for dish_form in dish_formset if dish_form.cleaned_data
+            ]
             self.object.save()
             return super().form_valid(form)
         return self.form_invalid(form)
@@ -65,13 +68,13 @@ class OrderUpdateView(UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         order = self.get_object()
-
         if self.request.method == 'POST':
-            context['dish_formset'] = DishFormSet(self.request.POST)
+            context['dish_formset'] = DishFormSetUpdate(self.request.POST)
         else:
-            initial_data = order.items if order.items else []
-            context['dish_formset'] = DishFormSet(initial=initial_data)
-
+            initial_data = [{'name': item['name'],
+                             'price': item['price'] / 100,
+                             'quantity': item['quantity']} for item in order.items]
+            context['dish_formset'] = DishFormSetUpdate(initial=initial_data)
         return context
 
     def form_valid(self, form):
@@ -79,7 +82,11 @@ class OrderUpdateView(UpdateView):
         dish_formset = context['dish_formset']
         if dish_formset.is_valid():
             self.object = form.save(commit=False)
-            self.object.items = [dish_form.cleaned_data for dish_form in dish_formset if dish_form.cleaned_data]
+            self.object.items = [
+                {**dish_form.cleaned_data, 'price': int(dish_form.cleaned_data['price'] * 100)}
+                for dish_form in dish_formset if
+                dish_form.cleaned_data and not dish_form.cleaned_data.get('DELETE', False)
+            ]
             self.object.save()
             return super().form_valid(form)
         return self.form_invalid(form)
