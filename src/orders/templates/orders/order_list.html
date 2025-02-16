@@ -1,12 +1,13 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load currency %}
 
 {% block title %}Список заказов{% endblock %}
 
 {% block content %}
 <h2>Список заказов</h2>
 
-<!-- Форма поиска заказов -->
+<!-- Search orders form -->
 <form method="get" action="" style="margin-bottom: 20px;">
     <label for="table_number">Номер стола:</label>
     <input type="text" name="table_number" id="table_number" value="{{ request.GET.table_number }}">
@@ -42,7 +43,7 @@
                     <ul>
                         {% for dish in order.items %}
                             <li>
-                                {{ dish.name }} — {{ dish.price }} руб.
+                                {{ dish.name }} — {{ dish.price|rubles|floatformat:2 }} руб.
                                 {% if dish.quantity %} ({{ dish.quantity }}){% endif %}
                             </li>
                         {% endfor %}
@@ -53,7 +54,7 @@
                 <!-- update order -->
                 <a href="{% url 'order_update' order.id %}" class="btn-edit">Изменить</a>
             </td>
-            <td>{{ order.total_price }} руб.</td>
+            <td>{{ order.total_price|rubles|floatformat:2 }} руб.</td>
             <td>
                 <!-- update order status form -->
                 <form method="post" action="{% url 'order_update_status' order.id %}">
