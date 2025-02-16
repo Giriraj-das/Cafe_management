@@ -22,6 +22,12 @@
                         {{ form.name.label_tag }} {{ form.name }}
                         {{ form.price.label_tag }} {{ form.price }}
                         {{ form.quantity.label_tag }} {{ form.quantity }}
+                        {% if dish_formset.can_delete and object %}
+                            <label for="{{ form.DELETE.id_for_label }}">Удалить</label>
+                            {{ form.DELETE }}
+                        {% else %}
+                            <button type="button" class="remove-dish">–</button>
+                        {% endif %}
                     </div>
                 {% endfor %}
             </div>
