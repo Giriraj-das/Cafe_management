@@ -3,9 +3,11 @@ from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from rest_framework import viewsets, filters
 
 from .models import Order
 from .forms import OrderForm, DishFormSetCreate, DishFormSetUpdate
+from .serializers import OrderSerializer
 
 
 class OrderListView(ListView):
@@ -41,7 +43,7 @@ class OrderCreateView(CreateView):
         if self.request.POST:
             context['dish_formset'] = DishFormSetCreate(self.request.POST)
         else:
-            context['dish_formset'] = DishFormSetCreate()  # extra=1: будет одна пустая форма
+            context['dish_formset'] = DishFormSetCreate()
         return context
 
     def form_valid(self, form):
@@ -108,3 +110,11 @@ class OrderRevenueView(View):
     def get(self, request):
         total_revenue = Order.get_total_revenue()
         return render(request, 'orders/order_revenue.html', {'total_revenue': total_revenue})
+
+
+class OrderViewSet(viewsets.ModelViewSet):
+    queryset = Order.objects.all().order_by('-id')
+    serializer_class = OrderSerializer
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['table_number', 'status']
+    ordering_fields = ['table_number', 'status', 'created_at']
