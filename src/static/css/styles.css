@@ -18,10 +18,32 @@ h2 {
     color: #333;
 }
 
-nav a {
+#navbar {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    text-align: center;
+}
+
+#navbar li {
+    display: inline;
+}
+
+#navbar a {
     color: #fff;
+    background-color: black;
+    border: 2px solid black;
+    padding: 10px 10px;
     text-decoration: none;
-    margin: 0 10px;
+    font-weight: bold;
+    border-radius: 4px;
+    display: inline-block;
+    width: 150px;
+}
+
+#navbar a:hover {
+    border: 2px solid black;
+    background-color: #333;
 }
 
 main {
@@ -48,19 +70,18 @@ th {
 }
 
 /* search form */
-form[method="get"] label {
-    margin-right: 5px;
+#search {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-width: 20%;
+    padding: 15px;
 }
 
-form[method="get"] input,
-form[method="get"] select {
-    margin-right: 10px;
-    padding: 5px;
-    font-size: 14px;
+#status {
+    padding: 8px;
 }
 
 /* create order */
-form {
+#create-order {
     margin: 0 auto;
     padding: 20px;
     background: white;
@@ -70,7 +91,6 @@ form {
 }
 
 input {
-    display: flex;
     padding: 10px;
     margin: 5px 0;
     border: 1px solid #ccc;

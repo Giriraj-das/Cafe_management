@@ -6,7 +6,7 @@
 
 {% block content %}
     <h2>{% if object %}Редактирование заказа{% else %}Создание заказа{% endif %}</h2>
-    <form method="post">
+    <form id="create-order" method="post">
         {% csrf_token %}
         <div class="order">
             <span class="order-type">Информация о заказе</span>
