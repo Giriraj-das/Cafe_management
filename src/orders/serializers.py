@@ -24,7 +24,7 @@ class OrderSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         items = validated_data.get('items', [])
-        # Преобразуем цену из рублей в копейки для каждого блюда
+        # Convert the price from rubles to kopecks for each dish
         for item in items:
             if 'price' in item:
                 item['price'] = int(float(item['price']) * 100)
@@ -39,8 +39,8 @@ class OrderSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         """
-        Переопределяем представление, чтобы total_price и цена в каждом блюде
-        отдавались в рублях (делёнными на 100).
+        Redefine the view so that total_price and the price in each dish
+        were given in rubles (divided by 100).
         """
         rep = super().to_representation(instance)
         if rep.get('total_price') is not None:
