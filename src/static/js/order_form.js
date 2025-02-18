@@ -1,25 +1,25 @@
 document.addEventListener('DOMContentLoaded', function() {
 
-    // Функция для привязки обработчиков к кнопкам удаления для новых строк
+    // Function for binding handlers to delete buttons for new rows
     function bindRemoveButtons() {
         document.querySelectorAll('.remove-dish').forEach(function(button) {
-            // Удаляем предыдущий обработчик, чтобы не навешивать несколько раз
+            // Delete the previous handler so that we don't have to hang it several times
             button.removeEventListener('click', removeNewRowHandler);
             button.addEventListener('click', removeNewRowHandler);
         });
     }
 
-    // Обработчик для кнопки удаления строки (для новых строк без поля DELETE)
+    // Handler for the delete row button (for new rows without DELETE field)
     function removeNewRowHandler() {
         var dishRow = this.closest('.dish-row');
         if (!dishRow) return;
 
-        // Если в строке есть поле DELETE, считаем, что это сохранённая строка – тогда не обрабатываем здесь.
+        // If there is a DELETE field in the string, we consider it to be a saved string - then we do not process it here.
         var deleteInput = dishRow.querySelector('input[name$="-DELETE"]');
         if (deleteInput) {
             return;
         } else {
-            // Новая строка: проверяем количество строк
+            // New line: check the number of lines
             var dishRows = document.querySelectorAll('#dish-formset .dish-row');
             if (dishRows.length > 1) {
                 dishRow.parentNode.removeChild(dishRow);
@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     totalFormsInput.value = parseInt(totalFormsInput.value) - 1;
                 }
             } else {
-                // Если это последняя строка, очищаем все её поля (при этом для поля количества ставим '1')
+                // If this is the last line, clear all its fields (set '1' for the quantity field).
                 dishRow.querySelectorAll('input').forEach(function(input) {
                     if (input.getAttribute('name').includes('quantity')) {
                         input.value = '1';
@@ -40,10 +40,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Привязываем обработчики для кнопок удаления уже существующих новых строк
+    // Bind handlers for the buttons of deleting existing new rows
     bindRemoveButtons();
 
-    // Обработчик для кнопки добавления новой строки
+    // Handler for the add new line button
     var addDishBtn = document.getElementById('add-dish');
     if (addDishBtn) {
         addDishBtn.addEventListener('click', function() {
@@ -51,11 +51,11 @@ document.addEventListener('DOMContentLoaded', function() {
             var totalFormsInput = document.querySelector('input[name="form-TOTAL_FORMS"]');
             var currentFormCount = parseInt(totalFormsInput.value);
 
-            // Клонируем первую строку как шаблон
+            // Clone the first line as a template
             var template = dishFormset.firstElementChild;
             var newForm = template.cloneNode(true);
 
-            // Удаляем из клона только элементы, связанные с удалением (поле DELETE и метку)
+            // Delete from the clone only the elements associated with the deletion (DELETE field and label)
             var deleteInput = newForm.querySelector('input[name$="-DELETE"]');
             if (deleteInput && deleteInput.parentNode) {
                 deleteInput.parentNode.removeChild(deleteInput);
@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 deleteLabel.parentNode.removeChild(deleteLabel);
             }
 
-            // Обновляем атрибуты name/id и очищаем значения в новой строке
+            // Update the name/id attributes and clear the values in a new line
             var inputs = newForm.querySelectorAll('input');
             inputs.forEach(function(input) {
                 var nameAttr = input.getAttribute('name');
@@ -81,8 +81,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
 
-            // Если в клоне уже есть кнопка удаления (с классом .remove-dish), оставляем её.
-            // Если нет – добавляем её.
+            // If the clone already has a remove button (with the .remove-dish class), leave it in.
+            // If not, we add it.
             if (!newForm.querySelector('.remove-dish')) {
                 var removeBtn = document.createElement('button');
                 removeBtn.type = 'button';
@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', function() {
             dishFormset.appendChild(newForm);
             totalFormsInput.value = currentFormCount + 1;
 
-            // Привязываем обработчики к кнопкам удаления, включая новую строку
+            // Bind handlers to the delete buttons, including a new line
             bindRemoveButtons();
         });
     }
