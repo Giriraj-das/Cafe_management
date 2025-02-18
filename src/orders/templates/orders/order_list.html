@@ -19,7 +19,7 @@
            <option value="{{ key }}" {% if request.GET.status == key %}selected{% endif %}>{{ value }}</option>
         {% endfor %}
     </select>
-    <button type="submit">Поиск</button>
+    <button class="button" type="submit">Поиск</button>
 </form>
 
 <table>
@@ -38,7 +38,7 @@
         <tr>
             <td>{{ order.id }}</td>
             <td>{{ order.table_number }}</td>
-            <td>
+            <td class="order-items-column">
                 {% if order.items %}
                     <ul>
                         {% for dish in order.items %}
@@ -54,8 +54,8 @@
                 <!-- update order -->
                 <a href="{% url 'order_update' order.id %}" class="btn-edit">Изменить</a>
             </td>
-            <td>{{ order.total_price|rubles|floatformat:2 }} руб.</td>
-            <td>
+            <td class="total-price-column">{{ order.total_price|rubles|floatformat:2 }} руб.</td>
+            <td class="status-column">
                 <!-- update order status form -->
                 <form method="post" action="{% url 'order_update_status' order.id %}">
                     {% csrf_token %}
@@ -68,9 +68,9 @@
             </td>
             <td>
                 <!-- delete order form -->
-                <form method="post" action="{% url 'order_delete' order.id %}">
+                <form class="delete-form" method="post" action="{% url 'order_delete' order.id %}">
                     {% csrf_token %}
-                    <button type="submit" onclick="return confirm('Удалить заказ №{{ order.id }}?');">Удалить</button>
+                    <button class="delete-btn" type="submit" onclick="return confirm('Удалить заказ №{{ order.id }}?');">Удалить</button>
                 </form>
             </td>
         </tr>

@@ -23,8 +23,11 @@
                         {{ form.price.label_tag }} {{ form.price }}
                         {{ form.quantity.label_tag }} {{ form.quantity }}
                         {% if dish_formset.can_delete and object %}
-                            <label for="{{ form.DELETE.id_for_label }}">Удалить</label>
-                            {{ form.DELETE }}
+                            <label class="custom-checkbox" for="{{ form.DELETE.id_for_label }}">
+                                Удалить
+                                {{ form.DELETE }}
+                                <span class="custom-checkmark"></span>
+                            </label>
                         {% else %}
                             <button type="button" class="remove-dish">–</button>
                         {% endif %}
@@ -33,7 +36,7 @@
             </div>
             <button type="button" id="add-dish">+</button>
         </div>
-        <button type="submit">Сохранить заказ</button>
+        <button class="button" type="submit">Сохранить заказ</button>
     </form>
 {% endblock %}
 
