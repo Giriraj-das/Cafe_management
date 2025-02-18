@@ -172,3 +172,8 @@ button[type="submit"]:hover {
 .remove-dish:hover {
     background-color: red;
 }
+
+#revenue {
+    font-size: 22px;
+    text-align: center;
+}
