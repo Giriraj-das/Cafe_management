@@ -1,4 +1,4 @@
-### Comments
+### Cafe management
 #### Python, Django, DRF, Postgres, Docker, HTML, CSS
 
 A full-featured Django web application for order management in a cafe.
